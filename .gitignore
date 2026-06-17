@@ -1,0 +1,22 @@
+# Python bytecode compilation caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local SQLite databases (Your Simulator State)
+# We ignore the database file because it changes every time you run the script, 
+# and you do not want your live testing logs filling up your Git commits.
+*.db
+*.sqlite3
+
+# Environment and configuration profiles
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Operating system artifacts
+.DS_Store
+Thumbs.db
