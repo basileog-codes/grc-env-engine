@@ -12,7 +12,7 @@ c = conn.cursor ()
 
 # c.execute ("INSERT INTO employees VALUES ('Basile', 'Grégoire', 4000)")
 
-c.execute ("SELECT * FROM employees WHERE last = 'Hugo'")
+c.execute ("SELECT * FROM employees WHERE last = 'Hugo'") 
 
 print (c.fetchone ())
 
