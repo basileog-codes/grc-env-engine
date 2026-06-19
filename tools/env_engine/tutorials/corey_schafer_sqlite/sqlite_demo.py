@@ -1,4 +1,5 @@
 import sqlite3
+from employee import Employee
 
 conn = sqlite3.connect ('employee.db')
 
@@ -10,13 +11,20 @@ c = conn.cursor ()
 #            pay integer
 #            )""" )
 
-c.execute ("INSERT INTO employees VALUES ('Jean-Marie', 'Grégoire', 6000)")
+emp_1 = Employee ('Paul', 'McCartney', 6500)
+emp_2 = Employee ('John', 'Lennon', 9000)
 
-conn.commit()
+print (emp_1.first)
+print (emp_1.last)
+print (emp_1.pay)
 
-c.execute ("SELECT * FROM employees WHERE last = 'Grégoire'") 
+# c.execute ("INSERT INTO employees VALUES ('Jean-Marie', 'Grégoire', 6000)")
 
-print (c.fetchall ())
+# conn.commit()
+
+# c.execute ("SELECT * FROM employees WHERE last = 'Grégoire'") 
+
+# print (c.fetchall ())
 
 conn.commit ()
 
