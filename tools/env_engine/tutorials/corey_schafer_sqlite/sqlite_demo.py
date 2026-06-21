@@ -22,18 +22,23 @@ emp_2 = Employee ('John', 'Lennon', 9000)
 
 conn.commit ()
 
+# - DATA DUPLICATE DELETION - START
 # c.execute ("SELECT rowid, * FROM employees WHERE last = 'McCartney'")
 # print (c.fetchall())
 
 # c.execute ("DELETE FROM employees WHERE rowid = :id_to_remove", {'id_to_remove': 4})
+# - DATA DUPLICATION DELETION - END
 
-# c.execute ("INSERT INTO employees VALUES (:first, :last, :pay)", {'first': emp_2.first, 'last': emp_2.last, 'pay': emp_2.pay})
+c.execute ("INSERT INTO employees VALUES (:first, :last, :pay)",
+           {'first': emp_2.first, 'last': emp_2.last, 'pay': emp_2.pay})
+
+conn.commit ()
 
 # c.execute ("INSERT INTO employees VALUES ('Jean-Marie', 'Grégoire', 6000)")
 
 # conn.commit()
 
-c.execute ("SELECT * FROM employees WHERE last = 'McCartney'") 
+c.execute ("SELECT * FROM employees WHERE last = 'Lennon'") 
 
 print (c.fetchall ())
 
