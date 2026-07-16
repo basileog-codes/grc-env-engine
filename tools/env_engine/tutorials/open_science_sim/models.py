@@ -408,7 +408,7 @@ def single_run (run_length, n_operators):
     print (f'End of run. Simulation clock time = {env.now}')
 
     # Calculate results on notebook level variables
-    mean_waiting_time = np.mean (results ['waiting_times'])
+    mean_waiting_time = np.mean (results['waiting_times'])
 
     return mean_waiting_time
 
@@ -426,3 +426,101 @@ TRACE = False
 mean_waiting_time = single_run (RUN_LENGTH, N_OPERATORS)
 print ("Simulation Complete")
 print (f"Waiting time for call operators: {mean_waiting_time:.2f} minutes") 
+
+# RESULTS COLLECTION EXERCISE
+# Exercise: Calculating the utilisation of the call operators
+
+# Task:
+# 1. Create a new entry to the results dictionary with the key total_call_duration
+# - You will use results ['total_call_duration'] to store the total time operators are in use during
+# the model run
+# 2. Modify the service function to update total_call_duration after each completes.
+# 3. After the run has completed, calculate the average operator utilisation
+# 4. Print the results to the screen
+
+# %% [CELL 1: Imports]
+import simpy
+import numpy as np
+
+# %% [CELL 2: Enable / disable print statements]
+def trace (msg):
+    if TRACE:
+        print (msg)
+
+# %% [CELL 3: Service function]
+def service (identifier, operators, env, rng, results):
+
+    start_wait = env.now
+
+    with operators.request () as req:
+        yield req
+
+        waiting_time = env.now - start_wait
+
+        results['waiting_times'].append (waiting_time)
+
+        trace (f'Operator answered call {identifier} at ' \
+           f'{env.now:.3f}')
+    
+        call_duration = rng.triangular (left = 5.0, mode = 7.0,
+                                            right = 10.0)
+    
+        yield env.timeout (call_duration)
+
+        results['total_call_duration'].append (call_duration)
+
+    trace (f'Call {identifier} ended {env.now:.3f}; ' \
+           f'Call duration is {call_duration:.3f}')
+
+# %% [CELL 4: Arrival generator function]
+def arrivals_generator (env, operators, results):
+    
+    rng = np.random.default_rng ()
+
+    caller_count = 0
+
+    while True:
+        caller_count += 1
+
+        inter_arrival_time = rng.exponential (60 / 100)
+
+        yield env.timeout (inter_arrival_time)
+
+        trace (f'Call arrives at {env.now:.3f}')
+
+        env.process (service (caller_count, operators, env, rng, results))
+
+# %% [CELL 5: Single run function]
+def single_run (run_length, n_operators, results):
+    
+    env = simpy.Environment ()
+
+    operators = simpy.Resource (env, capacity = n_operators)
+
+    env.process (arrivals_generator (env, operators, results))
+
+    env.run (until = run_length)
+    print (f'End of run. Simulation clock time = {env.now}')
+
+    mean_waiting_time = np.mean (results['waiting_times'])
+
+    sum_call_duration = np.sum (results['total_call_duration'])
+    total_available_time = n_operators * env.now
+    mean_operator_util = sum_call_duration / total_available_time * 100
+
+    return mean_waiting_time, mean_operator_util
+
+# %% [CELL 6: Run the model]
+results = {'waiting_times': [],
+           'total_call_duration': []}
+
+RUN_LENGTH = 1000
+N_OPERATORS = 13
+
+TRACE = False
+
+mean_waiting_time, avg_operator_util = single_run (RUN_LENGTH, N_OPERATORS, results)
+print ("Simulation Complete")
+print (f'''Results:
+1. Average waiting time: {mean_waiting_time:.2f}
+2. Average operator util: {avg_operator_util:.2f}''')
